@@ -388,25 +388,50 @@ appropriate steps below:
 
 2.  After `make linux-menuconfig`:
 
+    Assuming you're using the Nerves System Shell via Docker on a non-Linux host
+    and your custom system source directory is called `custom_rpi3`, you'll need
+    to do something like the following (the version identifiers might be
+    different for you).
+
     ```bash
     $ make linux-savedefconfig
-    $ cp build/linux-x.y.z/defconfig <your system>/linux-x.y_defconfig
+    $ cp build/linux-04c8e47067d4873c584395e5cb260b4f170a99ea/ /nerves/env/custom_rpi3/linux-4.4.defconfig
     ```
 
-    If your system doesn't contain a custom Linux configuration yet, you'll need
-    to update the Buildroot configuration (using `make menuconfig`) to point to
-    the new Linux defconfig in your system directory. The path is usually
-    something like `$(NERVES_DEFCONFIG_DIR)/linux-x.y_defconfig`.
+    If you're using Linux, the destination for the `cp` will simply be something
+    like `$(NERVES_DEFCONFIG_DIR)/linux-4.4.defconfig`.
+
+    > NOTE: If your system doesn't contain a custom Linux configuration yet,
+    you'll need to update the Buildroot configuration (using `make menuconfig`)
+    to point to the new Linux defconfig in your system directory. The path is
+    usually something like `$(NERVES_DEFCONFIG_DIR)/linux-x.y_defconfig`.
 
 3.  After `make busybox-menuconfig`:
 
+    Unfortunately, there's not currently an easy way to save a busybox defconfig.
+    What you have to do instead is save the full busybox config and configure it
+    to be included in your `nerves_defconfig`.
+
+    Assuming you're using the Nerves System Shell via Docker on a non-Linux host
+    and your custom system source directory is called `custom_rpi3`, you'll need
+    to do something like the following (the version identifiers might be
+    different for you).
+
     ```bash
-    $ make busybox-savedefconfig
-    $ cp build/busybox-x.y.z/defconfig <your system>/busybox-x.y_defconfig
+    $ cp build/busybox-1.27.2/.config /nerves/env/custom_rpi3/busybox_defconfig
     ```
 
     Like the Linux configuration, the Buildroot configuration will need to be
-    updated to point to the custom config if it isn't already.
+    updated to point to the custom config if it isn't already. This can be done
+    via `make menuconfig` and navigating to **Target Packages** and finding the
+    **Additional BusyBox configuration fragment files** option under the
+    **BusyBox** package, which should already be enabled and already have a base
+    configuration specified. If you're following along with this example, the
+    correct configuration value should look like this:
+
+    ```bash
+    ${NERVES_DEFCONFIG_DIR}/busybox_defconfig
+    ```
 
 The [Buildroot user manual](http://nightly.buildroot.org/manual.html) can be
 very helpful, especially if you need to add a package. The various Nerves system
